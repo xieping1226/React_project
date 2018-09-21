@@ -1,45 +1,48 @@
 import React, {Component} from 'react'
-import {
-  NavBar,
-  WingBlank,
-  List,
-  InputItem,
-  WhiteSpace,
-  Button
-} from 'antd-mobile'
+import {NavBar, WingBlank, List, WhiteSpace, InputItem, Button} from 'antd-mobile'
+import {connect} from 'react-redux'
+import {Redirect} from 'react-router-dom'
 
+import {login} from '../../redux/actions'
 import Logo from '../../componnets/logo/logo'
 
 
 
-export default class Login extends Component {
+class Login extends Component {
   state = {
     username: '',
     password: '',
   }
 
-  // 处理输入框/单选框变化, 收集数据到state
+
   handleChange = (name, value) => {
     this.setState({[name]: value})
   }
 
-  // 跳转到注册路由
-  toRegister = () => {
+
+  goRegister = () => {
     this.props.history.replace('/register')
   }
 
-  // 注册
   login = () => {
-    console.log(this.state)
+    // console.log(this.state)
+    const {username,password}=this.state
+    this.props.login(username,password)
   }
 
+
   render() {
+    const {redirectTo,msg}=this.props.user
+    if(redirectTo){
+      return <Redirect to={redirectTo}/>
+    }
     return (
       <div>
         <NavBar>硅谷直聘</NavBar>
         <Logo/>
         <WingBlank>
           <List>
+            {msg ? <p className='error-msg'>{msg}</p> : null}
             <InputItem
               placeholder='输入用户名'
               onChange={val => this.handleChange('username', val)}
@@ -57,10 +60,15 @@ export default class Login extends Component {
             <WhiteSpace/>
             <Button type='primary' onClick={this.login}>登&nbsp;&nbsp;&nbsp;陆</Button>
             <WhiteSpace/>
-            <Button onClick={this.toRegister}>还没有账号</Button>
+            <Button onClick={this.goRegister}>还没有账号</Button>
           </List>
         </WingBlank>
       </div>
     )
   }
 }
+
+export default connect(
+  state=>({user:state.user}),
+  {login}
+)(Login)
